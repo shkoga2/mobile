@@ -140,6 +140,8 @@
     <Compile Include="UI\Fragments\CreateTagDialogFragment.cs" />
     <Compile Include="UI\Views\SnappyLayout.cs" />
     <Compile Include="UI\Utils\Pool.cs" />
+    <Compile Include="UI\Activities\EditActivity.cs" />
+    <Compile Include="Net\PluginBroadcastReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -563,6 +565,8 @@
     <AndroidResource Include="Resources\layout\PieChartEmpty.axml" />
     <AndroidResource Include="Resources\layout\PieChartLoading.axml" />
     <AndroidResource Include="Resources\layout\PieChartStats.axml" />
+    <AndroidResource Include="Resources\layout\TaskerPlugin.axml" />
+    <AndroidResource Include="Resources\layout\TaskerPluginNotLoggedIn.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <Import Project="../packages/XamGuard.1.0.1/Proguard.targets" Condition="'$(Configuration)' != 'Debug'" />
