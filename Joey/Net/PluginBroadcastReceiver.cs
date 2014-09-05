@@ -18,6 +18,16 @@ namespace Toggl.Joey.Net
     {
         public override void OnReceive (Context context, Intent intent)
         {
+
+//            if (!com.twofortyfouram.locale.Intent.ACTION_FIRE_SETTING.equals(intent.getAction()))
+//            {
+//                if (Constants.IS_LOGGABLE)
+//                {
+//                    Log.e(Constants.LOG_TAG,
+//                        String.format(Locale.US, "Received unexpected Intent action %s", intent.getAction())); //$NON-NLS-1$
+//                }
+//                return;
+//            }
             Toast.MakeText (context, "Received intent!", ToastLength.Short).Show ();
         }
     }

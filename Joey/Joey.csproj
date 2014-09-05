@@ -141,7 +141,6 @@
     <Compile Include="UI\Views\SnappyLayout.cs" />
     <Compile Include="UI\Utils\Pool.cs" />
     <Compile Include="UI\Activities\EditActivity.cs" />
-    <Compile Include="Net\PluginBroadcastReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
