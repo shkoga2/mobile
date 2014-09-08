@@ -14,14 +14,14 @@ namespace Toggl.Joey.UI.Activities
 
         public static readonly String BlurbForTasker = "com.twofortyfouram.locale.intent.extra.BLURB";
         public static readonly String BundleForTasker = "com.twofortyfouram.locale.intent.extra.BUNDLE";
-        protected Button StopRunningButton { get; private set; }
-        protected Button CancelButton { get; private set; }
+        protected LinearLayout StopRunningButton { get; private set; }
+        protected LinearLayout CancelButton { get; private set; }
         private Boolean canceled = false;
 
         protected override void OnCreate (Bundle bundle)
         {
-            base.OnCreate (bundle);
 
+            base.OnCreate (bundle);
             var authManager = ServiceContainer.Resolve<AuthManager> ();
             if (!authManager.IsAuthenticated) {
                 SetContentView (Resource.Layout.TaskerPluginNotLoggedIn);
@@ -30,11 +30,10 @@ namespace Toggl.Joey.UI.Activities
 
             SetContentView (Resource.Layout.TaskerPlugin);
 
-            StopRunningButton = FindViewById<Button> (Resource.Id.PluginButtonStop);
+            StopRunningButton = FindViewById<LinearLayout> (Resource.Id.PluginButtonStop);
             StopRunningButton.Click += stopClicked;
-            CancelButton = FindViewById<Button> (Resource.Id.PluginButtonCancel);
+            CancelButton = FindViewById<LinearLayout> (Resource.Id.PluginButtonCancel);
             CancelButton.Click += cancelClicked;
-
         }
 
         public override void Finish()
@@ -54,6 +53,7 @@ namespace Toggl.Joey.UI.Activities
         {
             Finish ();
         }
+
         private void cancelClicked (object sender, EventArgs e)
         {
             canceled = true;

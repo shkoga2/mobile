@@ -3,24 +3,32 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <Button
+    <LinearLayout
         android:id="@+id/PluginButtonStop"
-        style="@style/Button.Green"
-        android:text="Stop timer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp" />
-    <Button
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:background="@drawable/MainListButton"
+        android:layout_marginTop="10dp">
+        <TextView
+            style="@style/TimeEntryListItem.Text.Project"
+            android:paddingLeft="4dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Stop running time entry" />
+    </LinearLayout>
+    <LinearLayout
         android:id="@+id/PluginButtonCancel"
-        style="@style/Button.Green"
-        android:text="Cancel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp" />
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:background="@drawable/MainListButton"
+        android:layout_marginTop="10dp">
+        <TextView
+            style="@style/TimeEntryListItem.Text.Project"
+            android:paddingLeft="4dp"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="Start last running time entry" />
+    </LinearLayout>
 </LinearLayout>
