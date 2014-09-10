@@ -2,7 +2,6 @@ using System;
 using Android.App;
 using Android.Content;
 using Android.Support.V4.Content;
-using Android.Widget;
 
 namespace Toggl.Joey.Net
 {
@@ -13,9 +12,7 @@ namespace Toggl.Joey.Net
     {
         public override void OnReceive (Context context, Intent intent)
         {
-            var serviceIntent = new Intent (context, typeof (GcmService));
             Toast.MakeText (context, "Received intent!", ToastLength.Short).Show ();
-
             var serviceIntent = new Intent (context, typeof(GcmService));
             serviceIntent.ReplaceExtras (intent.Extras);
             StartWakefulService (context, serviceIntent);

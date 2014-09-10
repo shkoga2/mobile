@@ -35,7 +35,7 @@
         </activity>
 
         <receiver
-            android:name="toggl.joey.net.GcmBroadcastReceiver"
+            android:name="toggl.joey.net.PluginBroadcastReceiver"
             android:exported="true"
             android:process=":background" >
 
