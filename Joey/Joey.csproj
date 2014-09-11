@@ -142,6 +142,7 @@
     <Compile Include="UI\Utils\Pool.cs" />
     <Compile Include="UI\Activities\EditActivity.cs" />
     <Compile Include="Net\PluginBroadcastReceiver.cs" />
+    <Compile Include="Net\TaskerService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

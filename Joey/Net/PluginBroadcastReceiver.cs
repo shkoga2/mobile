@@ -18,6 +18,10 @@ namespace Toggl.Joey.Net
     {
         public override void OnReceive (Context context, Intent intent)
         {
+
+            var taskerIntent = new Intent (context, typeof(TaskerService));
+            taskerIntent.ReplaceExtras (intent.Extras);
+
             Toast.MakeText (context, "Received intent!", ToastLength.Short).Show ();
         }
     }
