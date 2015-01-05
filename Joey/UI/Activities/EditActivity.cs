@@ -8,19 +8,21 @@ using XPlatUtils;
 
 namespace Toggl.Joey.UI.Activities
 {
-    [Activity (Label = "EditActivity")]            
+    [Activity (Label = "EditActivity")]
     public class EditActivity : Activity
     {
-
         public static readonly String BlurbForTasker = "com.twofortyfouram.locale.intent.extra.BLURB";
         public static readonly String BundleForTasker = "com.twofortyfouram.locale.intent.extra.BUNDLE";
+        public static readonly String TaskCommand = "com.toggl.timer.extra.COMMAND";
+        public static readonly int TaskNoAction = 0;
+        public static readonly int TaskStopRunning = 1;
         protected LinearLayout StopRunningButton { get; private set; }
-        protected LinearLayout CancelButton { get; private set; }
-        private Boolean canceled = false;
+        protected LinearLayout NoActionButton { get; private set; }
+        private Bundle CommandBundle = new Bundle();
+        private Intent ResultIntent = new Intent ();
 
         protected override void OnCreate (Bundle bundle)
         {
-
             base.OnCreate (bundle);
             var authManager = ServiceContainer.Resolve<AuthManager> ();
             if (!authManager.IsAuthenticated) {
@@ -29,34 +31,30 @@ namespace Toggl.Joey.UI.Activities
             }
 
             SetContentView (Resource.Layout.TaskerPlugin);
-
             StopRunningButton = FindViewById<LinearLayout> (Resource.Id.PluginButtonStop);
-            StopRunningButton.Click += stopClicked;
-            CancelButton = FindViewById<LinearLayout> (Resource.Id.PluginButtonCancel);
-            CancelButton.Click += cancelClicked;
+            StopRunningButton.Click += StopClicked;
+            NoActionButton = FindViewById<LinearLayout> (Resource.Id.PluginButtonNoAction);
+            NoActionButton.Click += NoActionClicked;
         }
 
-        public override void Finish()
+        public override void Finish ()
         {
-            var resultIntent = new Intent ();
-            var resultBundle = new Bundle ();
-            resultBundle.PutString ("com.toggl.timer.extra.STRING_MESSAGE", "Testing tasker");
-            resultIntent.PutExtra (BundleForTasker, resultBundle);
-            String blurb = canceled ? "No event" : "Stop entry";
-            resultIntent.PutExtra (BlurbForTasker, blurb);
-            SetResult (Result.Ok, resultIntent);
-
+            ResultIntent.PutExtra (BundleForTasker, CommandBundle);
+            SetResult (Result.Ok, ResultIntent);
             base.Finish ();
         }
 
-        private void stopClicked (object sender, EventArgs e)
+        private void StopClicked (object sender, EventArgs e)
         {
+            CommandBundle.PutInt (TaskCommand, TaskStopRunning);
+            ResultIntent.PutExtra (BlurbForTasker, "Stop running time entry");
             Finish ();
         }
 
-        private void cancelClicked (object sender, EventArgs e)
+        private void NoActionClicked (object sender, EventArgs e)
         {
-            canceled = true;
+            CommandBundle.PutInt (TaskCommand, TaskNoAction);
+            ResultIntent.PutExtra (BlurbForTasker, "No action what-so-ever.");
             Finish ();
         }
     }
