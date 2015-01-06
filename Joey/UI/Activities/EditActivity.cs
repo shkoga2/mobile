@@ -29,6 +29,9 @@ namespace Toggl.Joey.UI.Activities
                 SetContentView (Resource.Layout.TaskerPluginNotLoggedIn);
                 return;
             }
+            ActionBar.SetDisplayShowCustomEnabled (false);
+            ActionBar.SetDisplayShowTitleEnabled (true);
+            ActionBar.SetTitle (Resource.String.TaskerPluginActionBarTitle);
 
             SetContentView (Resource.Layout.TaskerPlugin);
             StopRunningButton = FindViewById<LinearLayout> (Resource.Id.PluginButtonStop);
