@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Toggl.Phoebe.Data.DataObjects;
 using Toggl.Phoebe.Data.Json.Converters;
+using Toggl.Phoebe.Data.Utils;
 using Toggl.Phoebe.Logging;
 using Toggl.Phoebe.Net;
 using XPlatUtils;
@@ -79,11 +80,11 @@ namespace Toggl.Phoebe.Data.Views
                         grp = GetGroupFor (entry);
                         grp.Add (entry);
                     } else {
-                        grp.DataObjects.UpdateData (entry);
+                        grp.UpdateEntryData (entry);
                     }
                     Sort ();
                 } else {
-                    grp.DataObjects.UpdateData (entry);
+                    grp.UpdateEntryData (entry);
                 }
                 OnUpdated ();
             } else {
@@ -337,6 +338,7 @@ namespace Toggl.Phoebe.Data.Views
         {
             private readonly DateTime date;
             private readonly List<TimeEntryData> dataObjects = new List<TimeEntryData> ();
+            private readonly List<TimeEntryGroup> groupedObjects = new List<TimeEntryGroup>();
 
             public DateGroup (DateTime date)
             {
@@ -353,6 +355,13 @@ namespace Toggl.Phoebe.Data.Views
                 get { return dataObjects; }
             }
 
+            public List<TimeEntryGroup> GroupedObjects
+            {
+                get {
+                    return groupedObjects;
+                }
+            }
+
             public event EventHandler Updated;
 
             private void OnUpdated ()
@@ -365,12 +374,59 @@ namespace Toggl.Phoebe.Data.Views
 
             public void Add (TimeEntryData dataObject)
             {
+                bool existGrouped = false;
+                foreach (var entryGroup in groupedObjects)
+                    if (entryGroup.Contains (dataObject)) {
+                        entryGroup.TimeEntryList.Add (dataObject);
+                        existGrouped = true;
+                    }
+
+                if (!existGrouped) {
+                    groupedObjects.Add (new TimeEntryGroup (dataObject));
+                }
+
                 dataObjects.Add (dataObject);
+                OnUpdated ();
+            }
+
+            public void UpdateEntryData ( TimeEntryData dataObject)
+            {
+                dataObjects.UpdateData (dataObject);
+
+                RemoveGroupedTimeEntry (dataObject);
+                bool existGrouped = false;
+
+                foreach (var entryGroup in groupedObjects)
+                    if (entryGroup.Contains (dataObject)) {
+                        entryGroup.TimeEntryList.Add (dataObject);
+                        entryGroup.TimeEntryList.Sort ((a, b) => b.StartTime.CompareTo (a.StartTime));
+                        existGrouped = true;
+                    }
+
+                if (!existGrouped) {
+                    groupedObjects.Add (new TimeEntryGroup (dataObject));
+                }
+
+                groupedObjects.Sort ((a, b) => b.StartTime.CompareTo (a.StartTime));
                 OnUpdated ();
             }
 
             public void Remove (TimeEntryData dataObject)
             {
+                var count = 0;
+
+                while (count < groupedObjects.Count) {
+                    var entryGroup = groupedObjects[count];
+                    if (entryGroup.Contains (dataObject)) {
+                        entryGroup.TimeEntryList.Remove (dataObject);
+                        if (entryGroup.Count == 0) {
+                            groupedObjects.Remove (entryGroup);
+                        }
+
+                        count = groupedObjects.Count;
+                    }
+                    count++;
+                }
                 dataObjects.Remove (dataObject);
                 OnUpdated ();
             }
@@ -378,7 +434,42 @@ namespace Toggl.Phoebe.Data.Views
             public void Sort ()
             {
                 dataObjects.Sort ((a, b) => b.StartTime.CompareTo (a.StartTime));
+                groupedObjects.Sort ((a, b) => b.StartTime.CompareTo (a.StartTime));
                 OnUpdated ();
+            }
+
+            public void RemoveGroup (TimeEntryGroup dataGroup)
+            {
+                foreach (var item in dataGroup.TimeEntryList) {
+                    dataObjects.Remove (item);
+                }
+                groupedObjects.Remove (dataGroup);
+                OnUpdated();
+            }
+
+            private void RemoveGroupedTimeEntry (TimeEntryData dataObject)
+            {
+                var currentGroup = GetContainerGroup (dataObject);
+                if (currentGroup != null) {
+                    currentGroup.TimeEntryList.RemoveAll ( d => d.Id == dataObject.Id);
+                }
+
+                if (currentGroup.Count == 0) {
+                    groupedObjects.Remove (currentGroup);
+                }
+            }
+
+            private TimeEntryGroup GetContainerGroup (TimeEntryData data)
+            {
+                TimeEntryGroup result = null;
+                foreach (var entryGroup in groupedObjects) {
+                    foreach (var entry in entryGroup.TimeEntryList) {
+                        if ( entry.Id == data.Id) {
+                            result = entryGroup;
+                        }
+                    }
+                }
+                return result;
             }
         }
 
