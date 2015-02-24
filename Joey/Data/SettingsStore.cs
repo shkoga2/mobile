@@ -22,6 +22,7 @@ namespace Toggl.Joey.Data
         private const string PhoebeLastAppVersionKey = "phoebeLastAppVersion";
         private const string PhoebeExperimentIdKey = "phoebeExperimentId";
         private const string PhoebeLastReportZoomKey = "lastReportZoomKey";
+        private const string PhoebeGroupedEntriesKey = "groupedEntriesKey";
         private const string JoeyInstallIdKey = "joeyInstallId";
         private const string JoeyGcmRegistrationIdKey = "joeyGcmRegistrationId";
         private const string JoeyGcmAppVersionKey = "joeyGcmAppVersion";
@@ -281,6 +282,18 @@ namespace Toggl.Joey.Data
             set {
                 SetInt (PhoebeLastReportZoomKey, value);
                 OnSettingChanged (PropertyLastReportZoomViewed);
+            }
+        }
+
+        public static readonly string PropertyGroupedTimeEntries = GetPropertyName (s => s.GroupedTimeEntries);
+
+        public bool GroupedTimeEntries
+        {
+            get { return GetInt (PhoebeGroupedEntriesKey) == 1; }
+            set {
+                SetInt (PhoebeGroupedEntriesKey, value ? 1 : 0);
+                OnSettingChanged (PropertyGroupedTimeEntries);
+                ServiceContainer.Resolve<ITracker> ().SendSettingsChangeEvent (SettingName.GroupedTimeEntries);
             }
         }
     }
