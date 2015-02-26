@@ -205,12 +205,6 @@ namespace Toggl.Joey.UI.Fragments
             }
 
             StartTimeEditText.Text = startTime.ToDeviceTimeString ();
-            if (startTime.Date != Time.Now.Date) {
-                DateTextView.Text = startTime.ToDeviceDateString ();
-                DateTextView.Visibility = ViewStates.Visible;
-            } else {
-                DateTextView.Visibility = ViewStates.Invisible;
-            }
 
             // Only update DescriptionEditText when content differs, else the user is unable to edit it
             if (!descriptionChanging && DescriptionEditText.Text != TimeEntry.Description) {
@@ -311,8 +305,6 @@ namespace Toggl.Joey.UI.Fragments
             return bmpDrawable;
         }
 
-        protected TextView DateTextView { get; private set; }
-
         protected TextView DurationTextView { get; private set; }
 
         protected EditText StartTimeEditText { get; private set; }
@@ -329,19 +321,33 @@ namespace Toggl.Joey.UI.Fragments
 
         protected ImageButton DeleteImageButton { get; private set; }
 
+        protected EditTimeEntryBit ProjectBit { get; private set; }
+
+        protected EditTimeEntryBit DescriptionBit { get; private set; }
+
+        protected EditTimeEntryBit TaskBit { get; private set; }
+
         public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle state)
         {
             var view = inflater.Inflate (Resource.Layout.EditTimeEntryFragment, container, false);
             cont = container;
-            DateTextView = view.FindViewById<TextView> (Resource.Id.DateTextView).SetFont (Font.Roboto);
-            DurationTextView = view.FindViewById<TextView> (Resource.Id.DurationTextView).SetFont (Font.Roboto);
+
+            DurationTextView = view.FindViewById<TextView> (Resource.Id.DurationTextView).SetFont (Font.RobotoLight);
             StartTimeEditText = view.FindViewById<EditText> (Resource.Id.StartTimeEditText).SetFont (Font.Roboto);
             StopTimeEditText = view.FindViewById<EditText> (Resource.Id.StopTimeEditText).SetFont (Font.Roboto);
-            DescriptionEditText = view.FindViewById<EditText> (Resource.Id.DescriptionEditText).SetFont (Font.RobotoLight);
-            ProjectEditText = view.FindViewById<EditText> (Resource.Id.ProjectEditText).SetFont (Font.RobotoLight);
+
+            DescriptionBit = view.FindViewById<EditTimeEntryBit> (Resource.Id.Description).DestroyAssistView().DestroyArrow().SetName ("Description");
+            DescriptionEditText = DescriptionBit.TextField;
+
+            ProjectBit = view.FindViewById<EditTimeEntryBit> (Resource.Id.Project).SetName ("Project");
+            ProjectEditText = ProjectBit.TextField;
+
+            TaskBit = view.FindViewById<EditTimeEntryBit> (Resource.Id.Task).DestroyAssistView ().SetName ("Task");
+
             TagsEditText = view.FindViewById<EditText> (Resource.Id.TagsEditText).SetFont (Font.RobotoLight);
+
             BillableCheckBox = view.FindViewById<CheckBox> (Resource.Id.BillableCheckBox).SetFont (Font.RobotoLight);
-            DeleteImageButton = view.FindViewById<ImageButton> (Resource.Id.DeleteImageButton);
+            DeleteImageButton = view.FindViewById<ImageButton> (Resource.Id.TrashButton);
 
             DurationTextView.Click += OnDurationTextViewClick;
             StartTimeEditText.Click += OnStartTimeEditTextClick;
