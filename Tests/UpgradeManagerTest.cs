@@ -109,6 +109,8 @@ namespace Toggl.Phoebe.Tests
             public string ExperimentId { get; set; }
 
             public int? LastReportZoomViewed { get; set; }
+
+            public bool GroupedTimeEntries { get; set; }
         }
     }
 }
