@@ -336,15 +336,22 @@ namespace Toggl.Joey.UI.Fragments
             StartTimeEditText = view.FindViewById<EditText> (Resource.Id.StartTimeEditText).SetFont (Font.Roboto);
             StopTimeEditText = view.FindViewById<EditText> (Resource.Id.StopTimeEditText).SetFont (Font.Roboto);
 
-            DescriptionBit = view.FindViewById<EditTimeEntryBit> (Resource.Id.Description).DestroyAssistView().DestroyArrow().SetName ("Description");
+            DescriptionBit = view.FindViewById<EditTimeEntryBit> (Resource.Id.Description).DestroyAssistView().DestroyArrow().SetName (Resource.String.BaseEditTimeEntryFragmentDescription);
             DescriptionEditText = DescriptionBit.TextField;
 
-            ProjectBit = view.FindViewById<EditTimeEntryBit> (Resource.Id.Project).SetName ("Project");
+            ProjectBit = view.FindViewById<EditTimeEntryBit> (Resource.Id.Project).SetName (Resource.String.BaseEditTimeEntryFragmentProject).SimulateButton();
             ProjectEditText = ProjectBit.TextField;
 
-            TaskBit = view.FindViewById<EditTimeEntryBit> (Resource.Id.Task).DestroyAssistView ().SetName ("Task");
+            TaskBit = view.FindViewById<EditTimeEntryBit> (Resource.Id.Task).DestroyAssistView ().SetName (Resource.String.BaseEditTimeEntryFragmentTask).SimulateButton();
 
-            TagsEditText = view.FindViewById<EditText> (Resource.Id.TagsEditText).SetFont (Font.RobotoLight);
+            var tagsTitle = view.FindViewById<TextView> (Resource.Id.EditTimeEntryTagsTitle);
+            TagsEditText = view.FindViewById<EditText> (Resource.Id.TagsEditText);
+
+
+            TagsEditText.Touch += (object sender, View.TouchEventArgs e) => {
+                e.Handled = false;
+                tagsTitle.Pressed = e.Event.Action != MotionEventActions.Up;
+            };
 
             BillableCheckBox = view.FindViewById<CheckBox> (Resource.Id.BillableCheckBox).SetFont (Font.RobotoLight);
             DeleteImageButton = view.FindViewById<ImageButton> (Resource.Id.TrashButton);
@@ -355,7 +362,8 @@ namespace Toggl.Joey.UI.Fragments
             DescriptionEditText.TextChanged += OnDescriptionTextChanged;
             DescriptionEditText.EditorAction += OnDescriptionEditorAction;
             DescriptionEditText.FocusChange += OnDescriptionFocusChange;
-            ProjectEditText.Click += OnProjectEditTextClick;
+            ProjectBit.Click += OnProjectClick;
+            ProjectEditText.Click += OnProjectClick;
             TagsEditText.Click += OnTagsEditTextClick;
             BillableCheckBox.CheckedChange += OnBillableCheckBoxCheckedChange;
             DeleteImageButton.Click += OnDeleteImageButtonClick;
@@ -421,7 +429,7 @@ namespace Toggl.Joey.UI.Fragments
             e.Handled = false;
         }
 
-        private void OnProjectEditTextClick (object sender, EventArgs e)
+        private void OnProjectClick (object sender, EventArgs e)
         {
             if (TimeEntry == null) {
                 return;

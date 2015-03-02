@@ -19,18 +19,18 @@ namespace Toggl.Joey.UI.Views
         {
             Initialize ();
         }
-
+           
         void Initialize ()
         {
             LayoutInflater inflater = (LayoutInflater)Context.GetSystemService (Context.LayoutInflaterService);
             inflater.Inflate (Resource.Layout.EditTimeEntryBit, this);
+
             TextView title = (TextView)FindViewById (Resource.Id.EditTimeEntryBitTitle);
             EditText text = (EditText)FindViewById (Resource.Id.EditTimeEntryBitText);
-            text.FocusChange += (object sender, FocusChangeEventArgs e) => {
-                title.Pressed = text.HasFocus;
-            };
-            title.Pressed = this.HasFocus;
 
+            text.FocusChange += (object sender, FocusChangeEventArgs e) => {
+                title.Selected = text.HasFocus;
+            };
         }
 
         public EditText TextField
@@ -47,6 +47,15 @@ namespace Toggl.Joey.UI.Views
             return this;
         }
 
+        public EditTimeEntryBit SetName (int resourceId)
+        {
+            TextView title = (TextView)FindViewById (Resource.Id.EditTimeEntryBitTitle);
+            title.SetText(resourceId);
+            EditText text = (EditText)FindViewById (Resource.Id.EditTimeEntryBitText);
+            text.SetText (resourceId);
+            return this;
+        }
+
         public EditTimeEntryBit DestroyAssistView()
         {
             TextView assistView = (TextView)FindViewById (Resource.Id.EditTimeEntryBitAssistView);
@@ -58,6 +67,18 @@ namespace Toggl.Joey.UI.Views
         {
             ImageView arrow = (ImageView)FindViewById (Resource.Id.EditTimeEntryBitArrow);
             arrow.Visibility = ViewStates.Gone;
+            return this;
+        }
+
+        public EditTimeEntryBit SimulateButton()
+        {
+            TextView title = (TextView)FindViewById (Resource.Id.EditTimeEntryBitTitle);
+            EditText text = (EditText)FindViewById (Resource.Id.EditTimeEntryBitText);
+            text.Touch += (object sender, TouchEventArgs e) => {
+                e.Handled = false;
+                title.Pressed = e.Event.Action != MotionEventActions.Up;
+            };
+            text.Focusable = text.Clickable = false;
             return this;
         }
     }
