@@ -176,4 +176,7 @@
     <string name="ReportsTotalBanner">Total</string>
     <string name="ReportsBillableBanner">Billable</string>
     <string name="ReportsSyncFailed">Oops! Failed to load data</string>
+    <string name="BaseEditTimeEntryFragmentProject">Project</string>
+    <string name="BaseEditTimeEntryFragmentTask">Task</string>
+    <string name="BaseEditTimeEntryFragmentDescription">Description</string>
 </resources>
