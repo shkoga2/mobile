@@ -136,7 +136,7 @@ namespace Toggl.Joey.UI.Adapters
 
             public TextView DescriptionTextView { get; private set; }
 
-            public View TagsView { get; private set; }
+            public NotificationImageView TagsView { get; private set; }
 
             public View BillableView { get; private set; }
 
@@ -154,7 +154,7 @@ namespace Toggl.Joey.UI.Adapters
                 ClientTextView = root.FindViewById<TextView> (Resource.Id.ClientTextView).SetFont (Font.Roboto);
                 TaskTextView = root.FindViewById<TextView> (Resource.Id.TaskTextView).SetFont (Font.Roboto);
                 DescriptionTextView = root.FindViewById<TextView> (Resource.Id.DescriptionTextView).SetFont (Font.RobotoLight);
-                TagsView = root.FindViewById<View> (Resource.Id.TagsIcon);
+                TagsView = root.FindViewById<NotificationImageView> (Resource.Id.TagsIcon);
                 BillableView = root.FindViewById<View> (Resource.Id.BillableIcon);
                 DurationTextView = root.FindViewById<TextView> (Resource.Id.DurationTextView).SetFont (Font.RobotoLight);
                 ContinueImageButton = root.FindViewById<ImageButton> (Resource.Id.ContinueImageButton);
@@ -284,14 +284,15 @@ namespace Toggl.Joey.UI.Adapters
                 var ctx = ServiceContainer.Resolve<Context> ();
 
                 if (DataSource.Model.Project != null && DataSource.Model.Project.Client != null) {
-                    ClientTextView.Text = DataSource.Model.Project.Client.Name;
+                    ClientTextView.Text = String.Format ("{0} • ", DataSource.Model.Project.Client.Name);
                     ClientTextView.Visibility = ViewStates.Visible;
                 } else {
                     ClientTextView.Visibility = ViewStates.Gone;
+                    ClientTextView.Text = String.Empty;
                 }
 
                 if (DataSource.Model.Task != null) {
-                    TaskTextView.Text = DataSource.Model.Task.Name;
+                    TaskTextView.Text = String.Format ("{0} • ", DataSource.Model.Task.Name);
                     TaskTextView.Visibility = ViewStates.Visible;
                 } else {
                     TaskTextView.Text = String.Empty;
@@ -307,6 +308,7 @@ namespace Toggl.Joey.UI.Adapters
                     } else {
                         ProjectTextView.Text = DataSource.Model.Project.Name;
                     }
+
                 } else {
                     ProjectTextView.Text = ctx.GetString (Resource.String.RecentTimeEntryNoProject);
                     ProjectTextView.SetTextColor (ctx.Resources.GetColor (Resource.Color.dark_gray_text));
@@ -371,6 +373,9 @@ namespace Toggl.Joey.UI.Adapters
                 }
 
                 var showTags = tagsView != null && tagsView.HasNonDefault;
+                if (showTags) {
+                    TagsView.BubbleCount = (int)tagsView.Count;
+                }
                 TagsView.Visibility = showTags ? ViewStates.Visible : ViewStates.Gone;
             }
         }
