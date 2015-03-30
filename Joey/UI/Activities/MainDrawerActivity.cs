@@ -7,17 +7,15 @@ using Android.Support.V4.Widget;
 using Android.Text.Format;
 using Android.Views;
 using Android.Widget;
+using Toggl.Joey.UI.Adapters;
+using Toggl.Joey.UI.Components;
+using Toggl.Joey.UI.Fragments;
+using Toggl.Joey.UI.Views;
 using Toggl.Phoebe;
 using Toggl.Phoebe.Data;
 using Toggl.Phoebe.Net;
 using XPlatUtils;
-using Toggl.Joey.UI.Adapters;
-using Toggl.Joey.UI.Components;
-using Toggl.Joey.UI.Fragments;
 using Fragment = Android.Support.V4.App.Fragment;
-using Toggl.Joey.UI.Views;
-using Toggl.Joey.UI.Utils;
-using Toggl.Phoebe.Data.Models;
 
 namespace Toggl.Joey.UI.Activities
 {
