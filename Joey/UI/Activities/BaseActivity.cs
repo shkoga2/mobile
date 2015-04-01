@@ -1,13 +1,12 @@
 ﻿using System;
 using Android.Content;
 using Android.OS;
-using Android.Views;
 using Bugsnag;
+using Toggl.Joey.UI.Fragments;
 using Toggl.Phoebe;
 using Toggl.Phoebe.Net;
 using XPlatUtils;
-using Toggl.Joey.UI.Fragments;
-using Activity = Android.Support.V4.App.FragmentActivity;
+using Activity = Android.Support.V7.App.ActionBarActivity;
 using FragmentManager = Android.Support.V4.App.FragmentManager;
 
 namespace Toggl.Joey.UI.Activities
@@ -103,7 +102,6 @@ namespace Toggl.Joey.UI.Activities
             subscriptionSyncFinished = bus.Subscribe<SyncFinishedMessage> (OnSyncFinished);
             subscriptionTogglHttpResponse = bus.Subscribe<TogglHttpResponseMessage> (OnTogglHttpResponse);
 
-            RequestWindowFeature (WindowFeatures.Progress);
         }
 
         protected sealed override void OnResume ()
