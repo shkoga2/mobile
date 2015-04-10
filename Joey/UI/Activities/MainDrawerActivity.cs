@@ -14,7 +14,9 @@ using Toggl.Joey.UI.Views;
 using Toggl.Phoebe.Data;
 using Toggl.Phoebe.Net;
 using XPlatUtils;
+using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
 using Fragment = Android.Support.V4.App.Fragment;
+using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace Toggl.Joey.UI.Activities
 {
@@ -51,9 +53,13 @@ namespace Toggl.Joey.UI.Activities
 
         protected ActionBarDrawerToggle DrawerToggle { get; private set; }
 
-        protected override void OnCreateActivity (Bundle bundle)
+        private FrameLayout DrawerSyncView { get; set; }
+
+        private Toolbar MainToolbar { get; set; }
+
+        protected override void OnCreateActivity (Bundle state)
         {
-            base.OnCreateActivity (bundle);
+            base.OnCreateActivity (state);
 
             SetContentView (Resource.Layout.MainDrawerActivity);
 
@@ -69,27 +75,25 @@ namespace Toggl.Joey.UI.Activities
             authManager.PropertyChanged += OnUserChangedEvent;
 
             DrawerLayout = FindViewById<DrawerLayout> (Resource.Id.DrawerLayout);
-
-            DrawerToggle = new ActionBarDrawerToggle (this, DrawerLayout, Resource.Drawable.IcDrawer, Resource.String.EntryName, Resource.String.EntryName);
+            DrawerToggle = new ActionBarDrawerToggle (this, DrawerLayout, MainToolbar, Resource.String.EntryName, Resource.String.EntryName);
 
             DrawerLayout.SetDrawerShadow (Resource.Drawable.drawershadow, (int)GravityFlags.Start);
             DrawerLayout.SetDrawerListener (DrawerToggle);
 
             Timer.OnCreate (this);
-            var lp = new ActionBar.LayoutParams (ActionBar.LayoutParams.WrapContent, ActionBar.LayoutParams.WrapContent);
+            var lp = new ActionBar.LayoutParams (ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
             lp.Gravity = GravityFlags.Right | GravityFlags.CenterVertical;
 
-            ActionBar.SetCustomView (Timer.Root, lp);
-            ActionBar.SetDisplayShowCustomEnabled (true);
-            ActionBar.SetDisplayHomeAsUpEnabled (true);
-            ActionBar.SetHomeButtonEnabled (true);
+            MainToolbar = FindViewById<Toolbar> (Resource.Id.MainToolbar);
+            SetSupportActionBar (MainToolbar);
+            SupportActionBar.SetTitle (Resource.String.MainDrawerTimer);
 
-            if (bundle == null) {
+            if (state == null) {
                 OpenPage (DrawerListAdapter.TimerPageId);
             } else {
                 // Restore page stack
                 pageStack.Clear ();
-                var arr = bundle.GetIntArray (PageStackExtra);
+                var arr = state.GetIntArray (PageStackExtra);
                 if (arr != null) {
                     pageStack.AddRange (arr);
                 }
@@ -126,11 +130,7 @@ namespace Toggl.Joey.UI.Activities
 
         public override bool OnOptionsItemSelected (IMenuItem item)
         {
-            if (DrawerToggle.OnOptionsItemSelected (item)) {
-                return true;
-            }
-
-            return base.OnOptionsItemSelected (item);
+            return DrawerToggle.OnOptionsItemSelected (item) || base.OnOptionsItemSelected (item);
         }
 
         protected override void OnStart ()
@@ -161,6 +161,7 @@ namespace Toggl.Joey.UI.Activities
                 base.OnBackPressed ();
             }
         }
+
         private void SetMenuSelection (int pos)
         {
             int parentPos = drawerAdapter.GetParentPosition (pos -1);
@@ -175,68 +176,46 @@ namespace Toggl.Joey.UI.Activities
             }
         }
 
-        private void SwitchActionBarView (int pageId)
-        {
-            bool showReportsActionBar = (pageId == DrawerListAdapter.ReportsPageId ||
-                                         pageId == DrawerListAdapter.ReportsWeekPageId ||
-                                         pageId == DrawerListAdapter.ReportsMonthPageId ||
-                                         pageId == DrawerListAdapter.ReportsYearPageId);
-
-            if (showReportsActionBar) {
-                ActionBar.SetDisplayShowTitleEnabled (true);
-                ActionBar.SetDisplayShowCustomEnabled (false);
-            } else {
-                ActionBar.SetDisplayShowTitleEnabled (false);
-                ActionBar.SetDisplayShowCustomEnabled (true);
-            }
-
-            // Configure timer component for selected page:
-            if (pageId != DrawerListAdapter.TimerPageId) {
-                Timer.HideAction = true;
-                Timer.HideDuration = false;
-            } else {
-                Timer.HideAction = false;
-            }
-        }
-
         private void OpenPage (int id)
         {
-            SwitchActionBarView (id);
-
             if (id == DrawerListAdapter.SettingsPageId) {
                 OpenFragment (settingsFragment.Value);
+                SupportActionBar.SetTitle (Resource.String.MainDrawerSettings);
             } else if (id == DrawerListAdapter.ReportsPageId) {
                 drawerAdapter.ExpandCollapse (DrawerListAdapter.ReportsPageId);
                 if (reportFragment.Value.ZoomLevel == ZoomLevel.Week) {
-                    ActionBar.SetTitle (Resource.String.MainDrawerReportsWeek);
+                    SupportActionBar.SetTitle (Resource.String.MainDrawerReportsWeek);
                     id = DrawerListAdapter.ReportsWeekPageId;
                 } else if (reportFragment.Value.ZoomLevel == ZoomLevel.Month) {
-                    ActionBar.SetTitle (Resource.String.MainDrawerReportsMonth);
+                    SupportActionBar.SetTitle (Resource.String.MainDrawerReportsMonth);
                     id = DrawerListAdapter.ReportsMonthPageId;
                 } else {
-                    ActionBar.SetTitle (Resource.String.MainDrawerReportsYear);
+                    SupportActionBar.SetTitle (Resource.String.MainDrawerReportsYear);
                     id = DrawerListAdapter.ReportsYearPageId;
                 }
                 OpenFragment (reportFragment.Value);
+                SupportActionBar.SetTitle (Resource.String.MainDrawerReportsMonth);
             } else if (id == DrawerListAdapter.ReportsWeekPageId) {
                 drawerAdapter.ExpandCollapse (DrawerListAdapter.ReportsPageId);
-                ActionBar.SetTitle (Resource.String.MainDrawerReportsWeek);
+                SupportActionBar.SetTitle (Resource.String.MainDrawerReportsWeek);
                 reportFragment.Value.ZoomLevel = ZoomLevel.Week;
                 OpenFragment (reportFragment.Value);
             } else if (id == DrawerListAdapter.ReportsMonthPageId) {
                 drawerAdapter.ExpandCollapse (DrawerListAdapter.ReportsPageId);
-                ActionBar.SetTitle (Resource.String.MainDrawerReportsMonth);
+                SupportActionBar.SetTitle (Resource.String.MainDrawerReportsMonth);
                 reportFragment.Value.ZoomLevel = ZoomLevel.Month;
                 OpenFragment (reportFragment.Value);
             } else if (id == DrawerListAdapter.ReportsYearPageId) {
                 drawerAdapter.ExpandCollapse (DrawerListAdapter.ReportsPageId);
-                ActionBar.SetTitle (Resource.String.MainDrawerReportsYear);
+                SupportActionBar.SetTitle (Resource.String.MainDrawerReportsYear);
                 reportFragment.Value.ZoomLevel = ZoomLevel.Year;
                 OpenFragment (reportFragment.Value);
             } else if (id == DrawerListAdapter.FeedbackPageId) {
+                SupportActionBar.SetTitle (Resource.String.MainDrawerFeedback);
                 drawerAdapter.ExpandCollapse (DrawerListAdapter.FeedbackPageId);
                 OpenFragment (feedbackFragment.Value);
             } else {
+                SupportActionBar.SetTitle (Resource.String.MainDrawerTimer);
                 OpenFragment (trackingFragment.Value);
                 drawerAdapter.ExpandCollapse (DrawerListAdapter.TimerPageId);
             }
