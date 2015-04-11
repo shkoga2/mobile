@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Android.Content;
 using Android.Graphics;
 using Android.Views;
 using Android.Widget;
@@ -13,6 +14,8 @@ using Toggl.Joey.UI.Views;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 
+using PopupArgs = Android.Widget.PopupMenu.MenuItemClickEventArgs;
+
 namespace Toggl.Joey.UI.Adapters
 {
     public class ProjectsRecyclerAdapter : RecyclerView.Adapter
@@ -23,6 +26,11 @@ namespace Toggl.Joey.UI.Adapters
         const int TYPE_CLIENT_SECTION = 1;
 
         public IEnumerable<object> CachedData;
+
+        public WorkspaceData Workspace
+        {
+            get { return dataView.Workspace; }
+        }
 
         public ProjectsRecyclerAdapter () : this (new ProjectsClientDataView())
         {
@@ -51,7 +59,7 @@ namespace Toggl.Joey.UI.Adapters
         public override int GetItemViewType (int position)
         {
             var dataholder = CachedData.ElementAt (position) as ProjectsClientDataView.DataHolder;
-            return dataholder.ClientHeader ? TYPE_CLIENT_SECTION : TYPE_PROJECTS;;
+            return dataholder.ClientHeader ? TYPE_CLIENT_SECTION : TYPE_PROJECTS;
         }
 
         public override void OnBindViewHolder (RecyclerView.ViewHolder holder, int position)
@@ -82,7 +90,7 @@ namespace Toggl.Joey.UI.Adapters
 
             public void BindFromDataHolder (ProjectsClientDataView.DataHolder holder)
             {
-                Text.Text = holder.Project.Client == null ? "No project" : holder.Project.Client.Name;
+                Text.Text = holder.Project.Client == null ? ItemView.Context.Resources.GetString (Resource.String.ProjectsNoClient) : holder.Project.Client.Name;
             }
         }
 
@@ -154,6 +162,11 @@ namespace Toggl.Joey.UI.Adapters
             if (dataView != null) {
                 dataView.LoadMore ();
             }
+        }
+
+        public WorkspaceData Workspace
+        {
+            get { return dataView.Workspaces.ElementAt (0).Data; }
         }
 
         public IEnumerable<object> Data
