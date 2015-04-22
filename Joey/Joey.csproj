@@ -142,7 +142,6 @@
     <Compile Include="UI\Utils\Pool.cs" />
     <Compile Include="UI\Adapters\GroupedTimeEntriesAdapter.cs" />
     <Compile Include="UI\Fragments\GroupedEditTimeEntryFragment.cs" />
-    <Compile Include="UI\Adapters\GroupTimeEntriesAdapter.cs" />
     <Compile Include="UI\Decorations\ItemDividerDecoration.cs" />
     <Compile Include="UI\Views\EditTimeEntryTagsBit.cs" />
     <Compile Include="UI\Views\NotificationImageView.cs" />
@@ -153,6 +152,7 @@
     <Compile Include="UI\Fragments\NewProjectFragment.cs" />
     <Compile Include="UI\Views\ColorPickerRecyclerView.cs" />
     <Compile Include="UI\Views\TogglField.cs" />
+    <Compile Include="UI\Adapters\GroupedEditAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
