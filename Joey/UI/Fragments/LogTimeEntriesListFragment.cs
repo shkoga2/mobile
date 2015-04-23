@@ -24,12 +24,14 @@ namespace Toggl.Joey.UI.Fragments
     {
         private ActionMode actionMode;
         private Subscription<SettingChangedMessage> subscriptionSettingChanged;
+        private FloatingActionButtonBasic FAB;
 
         public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = inflater.Inflate (Resource.Layout.LogTimeEntriesListFragment, container, false);
             view.FindViewById<TextView> (Resource.Id.EmptyTitleTextView).SetFont (Font.Roboto);
             view.FindViewById<TextView> (Resource.Id.EmptyTextTextView).SetFont (Font.RobotoLight);
+            FAB = view.FindViewById<FloatingActionButtonBasic> (Resource.Id.FABButton);
             return view;
         }
 
