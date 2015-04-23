@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.App;
+using Android.Content.PM;
 using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Views;
@@ -18,7 +19,9 @@ namespace Toggl.Joey.UI.Activities
 {
     [Activity (
          Exported = false,
-         WindowSoftInputMode = SoftInput.StateHidden)]
+         WindowSoftInputMode = SoftInput.StateHidden,
+         ScreenOrientation = ScreenOrientation.Portrait,
+         Theme = "@style/Theme.Toggl.App")]
     public class EditTimeEntryActivity : BaseActivity
     {
         public static readonly string ExtraTimeEntryId = "com.toggl.timer.time_entry_id";
