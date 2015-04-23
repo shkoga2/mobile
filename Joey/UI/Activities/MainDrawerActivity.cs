@@ -34,7 +34,7 @@ namespace Toggl.Joey.UI.Activities
     {
         private const string PageStackExtra = "com.toggl.timer.page_stack";
         private readonly TimerComponent barTimer = new TimerComponent ();
-        private readonly Lazy<TimeTrackingFragment> trackingFragment = new Lazy<TimeTrackingFragment> ();
+        private readonly Lazy<LogTimeEntriesListFragment> trackingFragment = new Lazy<LogTimeEntriesListFragment> ();
         private readonly Lazy<SettingsListFragment> settingsFragment = new Lazy<SettingsListFragment> ();
         private readonly Lazy<ReportsPagerFragment> reportFragment = new Lazy<ReportsPagerFragment> ();
         private readonly Lazy<FeedbackFragment> feedbackFragment = new Lazy<FeedbackFragment> ();
@@ -65,7 +65,7 @@ namespace Toggl.Joey.UI.Activities
             SetContentView (Resource.Layout.MainDrawerActivity);
 
             DrawerListView = FindViewById<ListView> (Resource.Id.DrawerListView);
-            DrawerUserView = this.LayoutInflater.Inflate (Resource.Layout.MainDrawerListHeader, null);
+            DrawerUserView = LayoutInflater.Inflate (Resource.Layout.MainDrawerListHeader, null);
             DrawerUserName = DrawerUserView.FindViewById<TextView> (Resource.Id.TitleTextView);
             DrawerImage = DrawerUserView.FindViewById<ProfileImageView> (Resource.Id.IconProfileImageView);
             DrawerListView.AddHeaderView (DrawerUserView);

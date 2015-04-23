@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Specialized;
+using System.Linq;
 using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
+using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Toggl.Joey.UI.Utils;
 using Toggl.Joey.UI.Views;
+using Toggl.Phoebe;
 using Toggl.Phoebe.Data;
 using Toggl.Phoebe.Data.Models;
 using Toggl.Phoebe.Data.Utils;
@@ -16,69 +20,13 @@ using XPlatUtils;
 
 namespace Toggl.Joey.UI.Adapters
 {
-    public class GroupedTimeEntriesAdapter : BaseDataViewAdapter<object>
+    public class GroupedTimeEntriesAdapter : RecycledDataViewAdapter<object>
     {
         protected static readonly int ViewTypeDateHeader = ViewTypeContent + 1;
-        protected static readonly int ViewTypeExpanded = ViewTypeContent + 2;
         private readonly Handler handler = new Handler ();
 
-        public GroupedTimeEntriesAdapter () : base (new AllTimeEntriesView ())
+        public GroupedTimeEntriesAdapter () : base (new GroupedTimeEntriesView ())
         {
-        }
-
-        public override bool IsEnabled (int position)
-        {
-            return GetEntry (position) is TimeEntryGroup;
-        }
-
-        public override int GetItemViewType (int position)
-        {
-            if (position == DataView.Count && DataView.IsLoading) {
-                return ViewTypeLoaderPlaceholder;
-            }
-
-            var obj = GetEntry (position);
-            if (obj is AllTimeEntriesView.DateGroup) {
-                return ViewTypeDateHeader;
-            }
-            return ViewTypeContent;
-        }
-
-        public override int ViewTypeCount
-        {
-            get { return base.ViewTypeCount + 2; }
-        }
-
-        private void OnDeleteTimeEntryGroup (TimeEntryGroup entryGroup)
-        {
-            var handler = HandleGroupDeletion;
-            if (handler != null) {
-                handler (entryGroup);
-            }
-        }
-
-        private void OnEditTimeEntryGroup (TimeEntryGroup entryGroup)
-        {
-            var handler = HandleGroupEditing;
-            if (handler != null) {
-                handler (entryGroup);
-            }
-        }
-
-        private void OnContinueTimeEntryGroup (TimeEntryGroup entryGroup)
-        {
-            var handler = HandleGroupContinue;
-            if (handler != null) {
-                handler (entryGroup);
-            }
-        }
-
-        private void OnStopTimeEntryGroup (TimeEntryGroup entryGroup)
-        {
-            var handler = HandleGroupStop;
-            if (handler != null) {
-                handler (entryGroup);
-            }
         }
 
         public Action<TimeEntryGroup> HandleGroupDeletion { get; set; }
@@ -89,38 +37,162 @@ namespace Toggl.Joey.UI.Adapters
 
         public Action<TimeEntryGroup> HandleGroupStop { get; set; }
 
-        protected override View GetModelView (int position, View convertView, ViewGroup parent)
+        protected override void CollectionChanged (NotifyCollectionChangedEventArgs e)
         {
-            View view = convertView;
-
-            var entry = GetEntry (position);
-            var viewType = GetItemViewType (position);
-
-            if (viewType == ViewTypeDateHeader) {
-                var dateGroup = (AllTimeEntriesView.DateGroup)entry;
-                if (view == null) {
-                    view = LayoutInflater.FromContext (ServiceContainer.Resolve<Context> ()).Inflate (
-                               Resource.Layout.LogTimeEntryListSectionHeader, parent, false);
-                    view.Tag = new LogTimeEntriesAdapter.HeaderListItemHolder (handler, view);
-                }
-                var holder = (LogTimeEntriesAdapter.HeaderListItemHolder)view.Tag;
-                holder.Bind (dateGroup);
-            } else {
-                var data = (TimeEntryGroup)entry;
-                data.InitModel();
-
-                if (view == null) {
-                    view = new LogTimeEntryItem (ServiceContainer.Resolve<Context> (), (IAttributeSet)null);
-                    view.Tag = new GroupedListItemHolder (handler, this, view);
-                }
-                var holder = (GroupedListItemHolder)view.Tag;
-                holder.Bind (data);
+            if (e.Action == NotifyCollectionChangedAction.Reset) {
+                NotifyDataSetChanged();
             }
 
-            return view;
+            if (e.Action == NotifyCollectionChangedAction.Add) {
+
+                if (e.NewItems.Count == 0) {
+                    return;
+                }
+
+                NotifyItemRangeInserted (e.NewStartingIndex, e.NewItems.Count);
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Replace) {
+                NotifyItemChanged (e.NewStartingIndex);
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Remove) {
+                NotifyItemRemoved (e.OldStartingIndex);
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Move) {
+                NotifyItemMoved (e.OldStartingIndex, e.NewStartingIndex);
+            }
         }
 
-        private class GroupedListItemHolder : ModelViewHolder<TimeEntryGroup>
+        private void OnDeleteTimeEntryGroup (TimeEntryGroup entryGroup)
+        {
+            var aHandler = HandleGroupDeletion;
+            if (aHandler != null) {
+                aHandler (entryGroup);
+            }
+        }
+
+        private void OnEditTimeEntryGroup (TimeEntryGroup entryGroup)
+        {
+            var aHandler = HandleGroupEditing;
+            if (aHandler != null) {
+                aHandler (entryGroup);
+            }
+        }
+
+        private void OnContinueTimeEntryGroup (TimeEntryGroup entryGroup)
+        {
+            var aHandler = HandleGroupContinue;
+            if (aHandler != null) {
+                aHandler (entryGroup);
+            }
+        }
+
+        private void OnStopTimeEntryGroup (TimeEntryGroup entryGroup)
+        {
+            var aHandler = HandleGroupStop;
+            if (aHandler != null) {
+                aHandler (entryGroup);
+            }
+        }
+
+        protected override RecyclerView.ViewHolder GetViewHolder (ViewGroup parent, int viewType)
+        {
+            View view;
+            RecyclerView.ViewHolder holder;
+
+            if (viewType == ViewTypeDateHeader) {
+                view = LayoutInflater.FromContext (ServiceContainer.Resolve<Context> ()).Inflate (Resource.Layout.LogTimeEntryListSectionHeader, parent, false);
+                holder = new HeaderListItemHolder (handler, view);
+            } else {
+                view = new LogTimeEntryItem (ServiceContainer.Resolve<Context> (), (IAttributeSet)null);
+                holder = new GroupedListItemHolder (handler, this, view);
+            }
+            return holder;
+        }
+
+        protected override void BindHolder (RecyclerView.ViewHolder holder, int position)
+        {
+            if (GetItemViewType (position) == ViewTypeDateHeader) {
+                var headerHolder = (HeaderListItemHolder)holder;
+                headerHolder.Bind ((GroupedTimeEntriesView.DateGroup) GetEntry (position));
+            } else {
+                var entryHolder = (GroupedListItemHolder)holder;
+                var model = (TimeEntryGroup)GetEntry (position);
+                entryHolder.Bind (model);
+            }
+        }
+
+        public override int GetItemViewType (int position)
+        {
+            if (position == DataView.Count && DataView.IsLoading) {
+                return ViewTypeLoaderPlaceholder;
+            }
+
+            var obj = GetEntry (position);
+            if (obj is GroupedTimeEntriesView.DateGroup) {
+                return ViewTypeDateHeader;
+            }
+            return ViewTypeContent;
+        }
+
+        private class HeaderListItemHolder : RecycledBindableViewHolder<GroupedTimeEntriesView.DateGroup>
+        {
+            private readonly Handler handler;
+
+            public TextView DateGroupTitleTextView { get; private set; }
+
+            public TextView DateGroupDurationTextView { get; private set; }
+
+            public HeaderListItemHolder (Handler handler, View root) : base (root)
+            {
+                this.handler = handler;
+                DateGroupTitleTextView = root.FindViewById<TextView> (Resource.Id.DateGroupTitleTextView).SetFont (Font.RobotoLight);
+                DateGroupDurationTextView = root.FindViewById<TextView> (Resource.Id.DateGroupDurationTextView).SetFont (Font.RobotoLight);
+            }
+
+            protected override void Rebind ()
+            {
+                DateGroupTitleTextView.Text = GetRelativeDateString (DataSource.Date);
+                RebindDuration ();
+            }
+
+            private void RebindDuration ()
+            {
+                if (DataSource == null || Handle == IntPtr.Zero) {
+                    return;
+                }
+
+                var models = DataSource.DataObjects.Select (data => data.Model).ToList ();
+                var duration = TimeSpan.FromSeconds (DataSource.DataObjects.Sum (m => m.Duration.TotalSeconds));
+                DateGroupDurationTextView.Text = duration.ToString (@"hh\:mm\:ss");
+
+                var runningModel = models.FirstOrDefault (m => m.State == TimeEntryState.Running);
+                if (runningModel != null) {
+                    handler.RemoveCallbacks (RebindDuration);
+                    handler.PostDelayed (RebindDuration, 1000 - runningModel.GetDuration ().Milliseconds);
+                }
+            }
+
+            private static string GetRelativeDateString (DateTime dateTime)
+            {
+                var ctx = ServiceContainer.Resolve<Context> ();
+                var ts = Time.Now.Date - dateTime.Date;
+                switch (ts.Days) {
+                case 0:
+                    return ctx.Resources.GetString (Resource.String.Today);
+                case 1:
+                    return ctx.Resources.GetString (Resource.String.Yesterday);
+                case -1:
+                    return ctx.Resources.GetString (Resource.String.Tomorrow);
+                default:
+                    return dateTime.ToDeviceDateString ();
+                }
+            }
+        }
+
+        private class GroupedListItemHolder :  RecycledModelViewHolder<TimeEntryGroup>, View.IOnClickListener
         {
             private readonly Handler handler;
             private readonly GroupedTimeEntriesAdapter adapter;
@@ -159,7 +231,9 @@ namespace Toggl.Joey.UI.Adapters
                 DurationTextView = root.FindViewById<TextView> (Resource.Id.DurationTextView).SetFont (Font.RobotoLight);
                 ContinueImageButton = root.FindViewById<ImageButton> (Resource.Id.ContinueImageButton);
 
+                root.SetOnClickListener (this);
                 ContinueImageButton.Click += OnContinueButtonClicked;
+                ContinueImageButton.Enabled = false;
             }
 
             private void OnContinueButtonClicked (object sender, EventArgs e)
@@ -168,7 +242,9 @@ namespace Toggl.Joey.UI.Adapters
                     return;
                 }
 
-                if (DataSource.State == TimeEntryState.Running) {
+                ContinueImageButton.Enabled = false;
+
+                if (DataSource.Model.State == TimeEntryState.Running) {
                     adapter.OnStopTimeEntryGroup (DataSource);
                     return;
                 }
@@ -213,7 +289,7 @@ namespace Toggl.Joey.UI.Adapters
             {
                 Tracker.MarkAllStale ();
 
-                if (DataSource != null && DataSource.Model != null) {
+                if (DataSource != null && DataSource.Count > 0) {
                     Tracker.Add (DataSource.Model, HandleTimeEntryPropertyChanged);
 
                     if (DataSource.Model.Project != null) {
@@ -277,7 +353,7 @@ namespace Toggl.Joey.UI.Adapters
 
                 ResetTrackedObservables ();
 
-                if (DataSource == null || DataSource.Model == null) {
+                if (DataSource == null || DataSource.Count == 0) {
                     return;
                 }
 
@@ -342,10 +418,9 @@ namespace Toggl.Joey.UI.Adapters
                     return;
                 }
 
-                var duration = DataSource.Duration;
                 DurationTextView.Text = DataSource.GetFormattedDuration ();
 
-                if (DataSource.State == TimeEntryState.Running) {
+                if (DataSource.Model.State == TimeEntryState.Running) {
                     handler.RemoveCallbacks (RebindDuration);
                     handler.PostDelayed (RebindDuration, 1000 - DataSource.Model.GetDuration().Milliseconds);
                 }
@@ -358,11 +433,13 @@ namespace Toggl.Joey.UI.Adapters
                     return;
                 }
 
-                if (DataSource.State == TimeEntryState.Running) {
+                if (DataSource.Model.State == TimeEntryState.Running) {
                     ContinueImageButton.SetImageResource (Resource.Drawable.IcStop);
                 } else {
                     ContinueImageButton.SetImageResource (Resource.Drawable.IcContinue);
                 }
+
+                ContinueImageButton.Enabled = true;
             }
 
             private void RebindTags ()
@@ -377,6 +454,12 @@ namespace Toggl.Joey.UI.Adapters
                     TagsView.BubbleCount = (int)tagsView.Count;
                 }
                 TagsView.Visibility = showTags ? ViewStates.Visible : ViewStates.Gone;
+            }
+
+            public void OnClick (View v)
+            {
+                // Temporal solution
+                adapter.OnEditTimeEntryGroup (DataSource);
             }
         }
     }
