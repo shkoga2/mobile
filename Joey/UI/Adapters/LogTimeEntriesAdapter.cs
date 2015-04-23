@@ -22,7 +22,10 @@ namespace Toggl.Joey.UI.Adapters
 {
     public class LogTimeEntriesAdapter : RecycledDataViewAdapter<object>
     {
+        public static readonly int ViewTypeLoaderPlaceholder = 0;
+        public static readonly int ViewTypeContent = 1;
         protected static readonly int ViewTypeDateHeader = ViewTypeContent + 1;
+
         private readonly Handler handler = new Handler ();
 
         public LogTimeEntriesAdapter () : base (new LogTimeEntriesView())
@@ -67,33 +70,33 @@ namespace Toggl.Joey.UI.Adapters
 
         private void OnDeleteTimeEntry (TimeEntryModel model)
         {
-            var handler = HandleTimeEntryDeletion;
-            if (handler != null) {
-                handler (model);
+            var mHandler = HandleTimeEntryDeletion;
+            if (mHandler != null) {
+                mHandler (model);
             }
         }
 
         private void OnEditTimeEntry (TimeEntryModel model)
         {
-            var handler = HandleTimeEntryEditing;
-            if (handler != null) {
-                handler (model);
+            var mHandler = HandleTimeEntryEditing;
+            if (mHandler != null) {
+                mHandler (model);
             }
         }
 
         private void OnContinueTimeEntry (TimeEntryModel model)
         {
-            var handler = HandleTimeEntryContinue;
-            if (handler != null) {
-                handler (model);
+            var mHandler = HandleTimeEntryContinue;
+            if (mHandler != null) {
+                mHandler (model);
             }
         }
 
         private void OnStopTimeEntry (TimeEntryModel model)
         {
-            var handler = HandleTimeEntryStop;
-            if (handler != null) {
-                handler (model);
+            var mHandler = HandleTimeEntryStop;
+            if (mHandler != null) {
+                mHandler (model);
             }
         }
 
