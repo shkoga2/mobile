@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using Android.Content;
-using Android.Graphics;
-using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Text;
-using Android.Text.Style;
 using Android.Views;
 using Android.Widget;
+using Toggl.Joey.UI.Activities;
+using Toggl.Joey.UI.Utils;
+using Toggl.Joey.UI.Views;
 using Toggl.Phoebe;
 using Toggl.Phoebe.Data;
 using Toggl.Phoebe.Data.Models;
@@ -15,15 +13,11 @@ using Toggl.Phoebe.Data.Utils;
 using Toggl.Phoebe.Data.Views;
 using Toggl.Phoebe.Logging;
 using XPlatUtils;
-using Toggl.Joey.UI.Activities;
-using Toggl.Joey.UI.Utils;
-using Toggl.Joey.UI.Views;
+using ActionBar = Android.Support.V7.App.ActionBar;
+using Activity = Android.Support.V7.App.ActionBarActivity;
 using Fragment = Android.Support.V4.App.Fragment;
 using MeasureSpec = Android.Views.View.MeasureSpec;
-
 using Toolbar = Android.Support.V7.Widget.Toolbar;
-using Activity = Android.Support.V7.App.ActionBarActivity;
-using ActionBar = Android.Support.V7.App.ActionBar;
 
 namespace Toggl.Joey.UI.Fragments
 {
@@ -411,7 +405,7 @@ namespace Toggl.Joey.UI.Fragments
                 return;
             }
 
-            var intent = new Intent (Activity, typeof (ProjectsActivity));
+            var intent = new Intent (Activity, typeof (ProjectListActivity));
             StartActivity (intent);
         }
 
