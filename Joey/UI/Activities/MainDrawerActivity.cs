@@ -39,7 +39,6 @@ namespace Toggl.Joey.UI.Activities
         private readonly Lazy<ReportsPagerFragment> reportFragment = new Lazy<ReportsPagerFragment> ();
         private readonly Lazy<FeedbackFragment> feedbackFragment = new Lazy<FeedbackFragment> ();
         private readonly List<int> pageStack = new List<int> ();
-        private readonly Handler handler = new Handler ();
         private DrawerListAdapter drawerAdapter;
 
         private ListView DrawerListView { get; set; }
