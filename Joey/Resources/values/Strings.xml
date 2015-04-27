@@ -192,4 +192,7 @@
     <string name="BaseEditTimeEntryFragmentTask">Task</string>
     <string name="BaseEditTimeEntryFragmentDescription">Description</string>
     <string name="BaseEditTimeEntryFragmentSaveButtonText">Save</string>
+    <string name="SwipeDeleteQuestion">Delete?</string>
+    <string name="UndoBarDeletedText">Time entry deleted</string>
+    <string name="UndoBarButtonText">UNDO</string>
 </resources>

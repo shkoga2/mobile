@@ -20,24 +20,19 @@ using XPlatUtils;
 
 namespace Toggl.Joey.UI.Adapters
 {
-    public class LogTimeEntriesAdapter : RecycledDataViewAdapter<object>
+    public class LogTimeEntriesAdapter : RecycledDataViewAdapter<object>, IUndoCapabilities
     {
-        protected static readonly int ViewTypeLoaderPlaceholder = 0;
-        protected static readonly int ViewTypeContent = 1;
+        public static readonly int ViewTypeLoaderPlaceholder = 0;
+        public static readonly int ViewTypeContent = 1;
         protected static readonly int ViewTypeDateHeader = ViewTypeContent + 1;
+
+        private LogTimeEntriesView modelView;
         private readonly Handler handler = new Handler ();
 
-        public LogTimeEntriesAdapter () : base (new LogTimeEntriesView())
+        public LogTimeEntriesAdapter (LogTimeEntriesView modelView) : base (modelView)
         {
+            this.modelView = modelView;
         }
-
-        public Action<TimeEntryModel> HandleTimeEntryDeletion { get; set; }
-
-        public Action<TimeEntryModel> HandleTimeEntryEditing { get; set; }
-
-        public Action<TimeEntryModel> HandleTimeEntryContinue { get; set; }
-
-        public Action<TimeEntryModel> HandleTimeEntryStop { get; set; }
 
         protected override void CollectionChanged (NotifyCollectionChangedEventArgs e)
         {
@@ -67,36 +62,30 @@ namespace Toggl.Joey.UI.Adapters
             }
         }
 
-        private void OnDeleteTimeEntry (TimeEntryModel model)
-        {
-            var handler = HandleTimeEntryDeletion;
-            if (handler != null) {
-                handler (model);
-            }
-        }
-
-        private void OnEditTimeEntry (TimeEntryModel model)
-        {
-            var handler = HandleTimeEntryEditing;
-            if (handler != null) {
-                handler (model);
-            }
-        }
-
         private void OnContinueTimeEntry (TimeEntryModel model)
         {
-            var handler = HandleTimeEntryContinue;
-            if (handler != null) {
-                handler (model);
-            }
+            modelView.ContinueTimeEntry (model);
         }
 
         private void OnStopTimeEntry (TimeEntryModel model)
         {
-            var handler = HandleTimeEntryStop;
-            if (handler != null) {
-                handler (model);
-            }
+            modelView.StopTimeEntry (model);
+        }
+
+        public void RemoveItemWithUndo (int index)
+        {
+            var entry = (TimeEntryData)DataView.Data.ElementAt (index);
+            modelView.RemoveItemWithUndo (entry);
+        }
+
+        public void RestoreItemFromUndo ()
+        {
+            modelView.RestoreItemFromUndo ();
+        }
+
+        public void ConfirmItemRemove ()
+        {
+            modelView.ConfirmItemRemove ();
         }
 
         protected override RecyclerView.ViewHolder GetViewHolder (ViewGroup parent, int viewType)
@@ -194,7 +183,7 @@ namespace Toggl.Joey.UI.Adapters
             }
         }
 
-        private class TimeEntryListItemHolder : RecycledModelViewHolder<TimeEntryModel>, View.IOnClickListener
+        private class TimeEntryListItemHolder : RecycledModelViewHolder<TimeEntryModel>, View.IOnTouchListener
         {
             private readonly Handler handler;
             private readonly LogTimeEntriesAdapter adapter;
@@ -232,22 +221,27 @@ namespace Toggl.Joey.UI.Adapters
                 BillableView = root.FindViewById<View> (Resource.Id.BillableIcon);
                 DurationTextView = root.FindViewById<TextView> (Resource.Id.DurationTextView).SetFont (Font.RobotoLight);
                 ContinueImageButton = root.FindViewById<ImageButton> (Resource.Id.ContinueImageButton);
-
-                root.SetOnClickListener (this);
-                ContinueImageButton.Click += OnContinueButtonClicked;
+                ContinueImageButton.SetOnTouchListener (this);
             }
 
-            private void OnContinueButtonClicked (object sender, EventArgs e)
+            public bool OnTouch (View v, MotionEvent e)
             {
-                if (DataSource == null) {
-                    return;
+                switch (e.Action) {
+                case MotionEventActions.Up:
+                    if (DataSource == null) {
+                        return false;
+                    }
+
+                    if (DataSource.State == TimeEntryState.Running) {
+                        adapter.OnStopTimeEntry (DataSource);
+                        return false;
+                    }
+
+                    adapter.OnContinueTimeEntry (DataSource);
+                    return false;
                 }
 
-                if (DataSource.State == TimeEntryState.Running) {
-                    adapter.OnStopTimeEntry (DataSource);
-                    return;
-                }
-                adapter.OnContinueTimeEntry (DataSource);
+                return false;
             }
 
             protected override void OnDataSourceChanged ()
@@ -355,6 +349,10 @@ namespace Toggl.Joey.UI.Adapters
                 if (DataSource == null) {
                     return;
                 }
+
+                // Init swipe delete bg
+                ((LogTimeEntryItem)ItemView).InitSwipeDeleteBg ();
+
                 var ctx = ServiceContainer.Resolve<Context> ();
 
                 if (DataSource.Project != null && DataSource.Project.Client != null) {
@@ -450,12 +448,6 @@ namespace Toggl.Joey.UI.Adapters
                     TagsView.BubbleCount = (int)tagsView.Count;
                 }
                 TagsView.Visibility = showTags ? ViewStates.Visible : ViewStates.Gone;
-            }
-
-            public void OnClick (View v)
-            {
-                // Temporal solution
-                adapter.OnEditTimeEntry (DataSource);
             }
         }
     }

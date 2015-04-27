@@ -156,6 +156,8 @@
     <Compile Include="UI\Activities\ProjectListActivity.cs" />
     <Compile Include="UI\Fragments\ProjectListFragment.cs" />
     <Compile Include="UI\Adapters\ProjectListAdapter.cs" />
+    <Compile Include="UI\Views\ListItemSwipeable.cs" />
+    <Compile Include="UI\Utils\SwipeDeleteTouchListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -637,6 +639,7 @@
     <AndroidResource Include="Resources\layout\LogTimeEntriesListFragment.axml" />
     <AndroidResource Include="Resources\layout\ProjectListActivityLayout.axml" />
     <AndroidResource Include="Resources\layout\ProjectListFragment.axml" />
+    <AndroidResource Include="Resources\layout\UndoBar.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <Import Project="../packages/XamGuard.1.0.3/Proguard.targets" Condition="'$(Configuration)' != 'Debug'" />

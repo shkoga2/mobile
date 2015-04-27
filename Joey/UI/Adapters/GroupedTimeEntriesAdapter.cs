@@ -20,24 +20,19 @@ using XPlatUtils;
 
 namespace Toggl.Joey.UI.Adapters
 {
-    public class GroupedTimeEntriesAdapter : RecycledDataViewAdapter<object>
+    public class GroupedTimeEntriesAdapter : RecycledDataViewAdapter<object>, IUndoCapabilities
     {
-        protected static readonly int ViewTypeLoaderPlaceholder = 0;
-        protected static readonly int ViewTypeContent = 1;
+        public static readonly int ViewTypeLoaderPlaceholder = 0;
+        public static readonly int ViewTypeContent = 1;
         protected static readonly int ViewTypeDateHeader = ViewTypeContent + 1;
+
+        private GroupedTimeEntriesView modelView;
         private readonly Handler handler = new Handler ();
 
-        public GroupedTimeEntriesAdapter () : base (new GroupedTimeEntriesView ())
+        public GroupedTimeEntriesAdapter (GroupedTimeEntriesView modelView) : base (modelView)
         {
+            this.modelView = modelView;
         }
-
-        public Action<TimeEntryGroup> HandleGroupDeletion { get; set; }
-
-        public Action<TimeEntryGroup> HandleGroupEditing { get; set; }
-
-        public Action<TimeEntryGroup> HandleGroupContinue { get; set; }
-
-        public Action<TimeEntryGroup> HandleGroupStop { get; set; }
 
         protected override void CollectionChanged (NotifyCollectionChangedEventArgs e)
         {
@@ -67,36 +62,30 @@ namespace Toggl.Joey.UI.Adapters
             }
         }
 
-        private void OnDeleteTimeEntryGroup (TimeEntryGroup entryGroup)
-        {
-            var aHandler = HandleGroupDeletion;
-            if (aHandler != null) {
-                aHandler (entryGroup);
-            }
-        }
-
-        private void OnEditTimeEntryGroup (TimeEntryGroup entryGroup)
-        {
-            var aHandler = HandleGroupEditing;
-            if (aHandler != null) {
-                aHandler (entryGroup);
-            }
-        }
-
         private void OnContinueTimeEntryGroup (TimeEntryGroup entryGroup)
         {
-            var aHandler = HandleGroupContinue;
-            if (aHandler != null) {
-                aHandler (entryGroup);
-            }
+            modelView.ContinueTimeEntryGroup (entryGroup);
         }
 
         private void OnStopTimeEntryGroup (TimeEntryGroup entryGroup)
         {
-            var aHandler = HandleGroupStop;
-            if (aHandler != null) {
-                aHandler (entryGroup);
-            }
+            modelView.StopTimeEntryGroup (entryGroup);
+        }
+
+        public void RemoveItemWithUndo (int index)
+        {
+            var entry = (TimeEntryGroup)DataView.Data.ElementAt (index);
+            modelView.RemoveItemWithUndo (entry);
+        }
+
+        public void RestoreItemFromUndo ()
+        {
+            modelView.RestoreItemFromUndo ();
+        }
+
+        public void ConfirmItemRemove ()
+        {
+            modelView.ConfirmItemRemove ();
         }
 
         protected override RecyclerView.ViewHolder GetViewHolder (ViewGroup parent, int viewType)
@@ -194,7 +183,7 @@ namespace Toggl.Joey.UI.Adapters
             }
         }
 
-        private class GroupedListItemHolder :  RecycledModelViewHolder<TimeEntryGroup>, View.IOnClickListener
+        private class GroupedListItemHolder :  RecycledModelViewHolder<TimeEntryGroup>, View.IOnTouchListener
         {
             private readonly Handler handler;
             private readonly GroupedTimeEntriesAdapter adapter;
@@ -232,25 +221,27 @@ namespace Toggl.Joey.UI.Adapters
                 BillableView = root.FindViewById<View> (Resource.Id.BillableIcon);
                 DurationTextView = root.FindViewById<TextView> (Resource.Id.DurationTextView).SetFont (Font.RobotoLight);
                 ContinueImageButton = root.FindViewById<ImageButton> (Resource.Id.ContinueImageButton);
-
-                root.SetOnClickListener (this);
-                ContinueImageButton.Click += OnContinueButtonClicked;
-                ContinueImageButton.Enabled = false;
+                ContinueImageButton.SetOnTouchListener (this);
             }
 
-            private void OnContinueButtonClicked (object sender, EventArgs e)
+            public bool OnTouch (View v, MotionEvent e)
             {
-                if (DataSource == null) {
-                    return;
+                switch (e.Action) {
+                case MotionEventActions.Up:
+                    if (DataSource == null) {
+                        return false;
+                    }
+
+                    if (DataSource.Model.State == TimeEntryState.Running) {
+                        adapter.OnStopTimeEntryGroup (DataSource);
+                        return false;
+                    }
+
+                    adapter.OnContinueTimeEntryGroup (DataSource);
+                    return false;
                 }
 
-                ContinueImageButton.Enabled = false;
-
-                if (DataSource.Model.State == TimeEntryState.Running) {
-                    adapter.OnStopTimeEntryGroup (DataSource);
-                    return;
-                }
-                adapter.OnContinueTimeEntryGroup (DataSource);
+                return false;
             }
 
             protected override void OnDataSourceChanged ()
@@ -359,6 +350,9 @@ namespace Toggl.Joey.UI.Adapters
                     return;
                 }
 
+                // Init swipe delete bg
+                ((LogTimeEntryItem)ItemView).InitSwipeDeleteBg ();
+
                 var ctx = ServiceContainer.Resolve<Context> ();
 
                 if (DataSource.Model.Project != null && DataSource.Model.Project.Client != null) {
@@ -440,8 +434,6 @@ namespace Toggl.Joey.UI.Adapters
                 } else {
                     ContinueImageButton.SetImageResource (Resource.Drawable.IcContinue);
                 }
-
-                ContinueImageButton.Enabled = true;
             }
 
             private void RebindTags ()
@@ -456,12 +448,6 @@ namespace Toggl.Joey.UI.Adapters
                     TagsView.BubbleCount = (int)tagsView.Count;
                 }
                 TagsView.Visibility = showTags ? ViewStates.Visible : ViewStates.Gone;
-            }
-
-            public void OnClick (View v)
-            {
-                // Temporal solution
-                adapter.OnEditTimeEntryGroup (DataSource);
             }
         }
     }
