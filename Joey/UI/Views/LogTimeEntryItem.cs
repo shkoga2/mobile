@@ -114,7 +114,7 @@ namespace Toggl.Joey.UI.Views
                 LayoutChildView (tagsIcon, durationBar, currentTop, tagsIcon.MeasuredWidth, tagsIcon.MeasuredHeight);
             }
 
-            int usableWidthFirstLine = durationBar - paddingLeft;
+            int usableWidthFirstLine = r - continueImageButton.MeasuredWidth - paddingLeft;
             int firstWidth = 0;
 
             if (clientTextView.Text != String.Empty) {

@@ -18,27 +18,27 @@
         style="@style/TimeEntryListItem.Text.Client"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:paddingTop="17dp" />
+        android:paddingTop="10dp" />
     <TextView
         android:id="@+id/ProjectTextView"
         style="@style/TimeEntryListItem.Text.Project"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:text="Project"
-        android:paddingTop="17dp" />
+        android:paddingTop="10dp" />
     <TextView
         android:id="@+id/TaskTextView"
         style="@style/TimeEntryListItem.Text.Task"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:paddingTop="36dp" />
+        android:paddingTop="42dp" />
     <TextView
         android:id="@+id/DescriptionTextView"
         style="@style/TimeEntryListItem.Text.Description"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:text="@string/RecentTimeEntryNoDescription"
-        android:paddingTop="36dp" />
+        android:paddingTop="42dp" />
     <Toggl.Joey.UI.Views.NotificationImageView
         android:id="@+id/TagsIcon"
         android:layout_width="wrap_content"
