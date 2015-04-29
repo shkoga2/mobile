@@ -42,17 +42,19 @@
     <Toggl.Joey.UI.Views.NotificationImageView
         android:id="@+id/TagsIcon"
         android:layout_width="wrap_content"
-        android:layout_height="72dp"
-        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:paddingTop="10dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:src="@drawable/IcTagsMiniGray" />
     <ImageView
         android:id="@+id/BillableIcon"
         android:layout_width="wrap_content"
-        android:layout_height="72dp"
+        android:layout_height="wrap_content"
         android:paddingRight="5dp"
-        android:gravity="center"
+        android:paddingTop="10dp"
+        android:gravity="top"
         android:src="@drawable/IcBillableMiniGray" />
     <TextView
         android:id="@+id/DurationTextView"
@@ -60,7 +62,8 @@
         android:layout_width="wrap_content"
         android:layout_height="72dp"
         android:paddingRight="12dp"
-        android:gravity="center"
+        android:paddingTop="10dp"
+        android:gravity="top"
         android:layout_alignParentTop="true"
         android:text="04:15:34" />
     <ImageButton
@@ -68,7 +71,7 @@
         android:layout_width="wrap_content"
         android:layout_height="72dp"
         android:paddingLeft="5dp"
-        android:paddingRight="32dp"
+        android:paddingRight="25dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:id="@+id/ContinueImageButton"
