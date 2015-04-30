@@ -20,9 +20,6 @@ namespace Toggl.Joey.UI.Views
         private ImageView billableIcon;
         private NotificationImageView tagsIcon;
         private View backgroundView;
-//        private Drawable fadeDrawable;
-//        private int fadeWidth;
-//        private Rectangle fadeRect;
         private View view;
 
         private Drawable topFadeDrawable;
@@ -69,7 +66,7 @@ namespace Toggl.Joey.UI.Views
             var width = (int)TypedValue.ApplyDimension (ComplexUnitType.Dip, 20, Resources.DisplayMetrics);
 
             var d = new FadeDrawable (width);
-            d.SetStateColor (new int[] { }, Android.Graphics.Color.Black);
+            d.SetStateColor (new int[] { }, Android.Graphics.Color.White);
             return d;
         }
 
@@ -132,7 +129,6 @@ namespace Toggl.Joey.UI.Views
             }
 
             LayoutChildView (projectTextView, paddingLeft + firstWidth, currentTop, GetSecondElementWidth (usableWidthFirstLine, firstWidth, projectTextView.MeasuredWidth), projectTextView.MeasuredHeight);
-
             topFadeRect = new Rectangle (
                 usableWidthFirstLine + paddingLeft, currentTop,
                 0, Math.Max (projectTextView.MeasuredHeight, clientTextView.MeasuredHeight)
@@ -166,7 +162,6 @@ namespace Toggl.Joey.UI.Views
                     descriptionTextView.MeasuredHeight
                 );
             }
-            Console.WriteLine ("max: {0}", Math.Max (taskTextView.MeasuredHeight, descriptionTextView.MeasuredHeight));
             bottomFadeRect = new Rectangle (
                 secondLineMark, currentTop + durationTextView.MeasuredHeight,
                 0, Math.Max (taskTextView.MeasuredHeight, descriptionTextView.MeasuredHeight)
