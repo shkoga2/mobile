@@ -27,22 +27,6 @@ namespace Toggl.Joey.UI.Views
         private Rectangle fadeRect;
         private View view;
 
-        public override bool Selected
-        {
-            get {
-                return base.Selected;
-            } set {
-                if (value == base.Selected) {
-                    return;
-                }
-
-                base.Selected = value;
-                var color = (value) ? selectedColor : normalColor;
-                backgroundView.SetBackgroundColor (color);
-                ReplaceDrawable (ref fadeDrawable, ref fadeWidth, MakeFadeDrawable ());
-            }
-        }
-
         public LogTimeEntryItem (Context context, IAttributeSet attrs) : base (context, attrs)
         {
             view = LayoutInflater.FromContext (context).Inflate (Resource.Layout.LogTimeEntryListItem, this, true);
