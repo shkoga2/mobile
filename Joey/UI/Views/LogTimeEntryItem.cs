@@ -20,7 +20,7 @@ namespace Toggl.Joey.UI.Views
         private ImageButton continueImageButton;
         private TextView durationTextView;
         private ImageView billableIcon;
-        private ImageView tagsIcon;
+        private NotificationImageView tagsIcon;
         private View backgroundView;
         private Drawable fadeDrawable;
         private int fadeWidth;
@@ -69,7 +69,7 @@ namespace Toggl.Joey.UI.Views
             continueImageButton = view.FindViewById<ImageButton> (Resource.Id.ContinueImageButton);
             durationTextView = view.FindViewById<TextView> (Resource.Id.DurationTextView);
             billableIcon = view.FindViewById<ImageView> (Resource.Id.BillableIcon);
-            tagsIcon = view.FindViewById<ImageView> (Resource.Id.TagsIcon);
+            tagsIcon = view.FindViewById<NotificationImageView> (Resource.Id.TagsIcon);
 
             ReplaceDrawable (ref fadeDrawable, ref fadeWidth, MakeFadeDrawable ());
         }
