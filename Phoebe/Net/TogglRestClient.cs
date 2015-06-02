@@ -18,10 +18,13 @@ namespace Toggl.Phoebe.Net
     {
         private static readonly DateTime UnixStart = new DateTime (1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         private readonly Uri v8Url;
+        private readonly Uri v9Url;
+
 
         public TogglRestClient (Uri url)
         {
             v8Url = new Uri (url, "v8/");
+            v9Url = new Uri (url, "v9/");
         }
 
         private HttpClient MakeHttpClient ()
@@ -325,6 +328,22 @@ namespace Toggl.Phoebe.Net
             return DeleteObject (url);
         }
 
+        private async Task<T> PatchObjects<T> (Uri url, T jsonObject)
+            where T: CommonJson {
+            var json = StringifyJson (jsonObject);
+            var httpReq = SetupRequest (new HttpRequestMessage () {
+                Method = new HttpMethod("PATCH"),
+                RequestUri = url,
+                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+            });
+
+            var httpResp = await SendAsync (httpReq)
+                .ConfigureAwait (continueOnCapturedContext: false);
+            var respData = await httpResp.Content.ReadAsStringAsync ().ConfigureAwait (false);
+            return JsonConvert.DeserializeObject<Wrapper<T>> (respData).Data ?? new Wrapper<T> ().Data;
+        }
+
+
         #region Client methods
 
         public Task<ClientJson> CreateClient (ClientJson jsonObject)
@@ -519,6 +538,12 @@ namespace Toggl.Phoebe.Net
         {
             var url = new Uri (v8Url, String.Format ("time_entries/{0}", jsonObject.Id.Value.ToString ()));
             return DeleteObject (url);
+        }
+
+        public Task<TimeEntryJson> UpdateTimeEntries (TimeEntryJson jsonObject)
+        {
+            var url = new Uri (v9Url, String.Format("time_entries/{0}", jsonObject.Id.Value.ToString()));
+            return PatchObjects (url, jsonObject);
         }
 
         #endregion
