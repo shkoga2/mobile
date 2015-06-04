@@ -58,13 +58,6 @@ namespace Toggl.Joey.UI.Views
             SetImageDrawable (endDrawable);
         }
 
-        private bool renewBase
-        {
-            get {
-                return (baseCanvas == null || (bubbleText != null && bubbleText.Text.Length > bubbleCount.ToString ().Length)) ? true : false;
-            }
-        }
-
         private void MakeBubbleText ()
         {
             var dm = ctx.Resources.DisplayMetrics;
