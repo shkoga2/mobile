@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <style name="Theme.Toggl.Base" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowActionBarOverlay">true</item>
     </style>
     <style name="Theme.Toggl.Splash"  parent="Theme.Toggl.Base">
         <item name="android:windowBackground">@drawable/splashscreen</item>
@@ -10,7 +11,7 @@
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@color/windowBackground</item>
-        <item name="colorPrimary">@color/primary</item> <!-- Toolbar branding color -->
+        <item name="colorPrimary">@android:color/transparent</item> <!-- Toolbar branding color -->
         <item name="colorPrimaryDark">@color/primaryDark</item> <!-- statusBarColor is inherited from this -->
         <item name="colorAccent">@color/windowBackground</item>
         <item name="android:listViewStyle">@style/Theme.Toggl.ListView</item>

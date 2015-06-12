@@ -165,6 +165,17 @@
     <Compile Include="UI\Views\ShadowItemDecoration.cs" />
     <Compile Include="UI\Activities\SplashActivity.cs" />
     <Compile Include="UI\Utils\DimensionsExtensions.cs" />
+    <Compile Include="UI\Views\StickyHeaderBuilder.cs" />
+    <Compile Include="UI\Views\StickyHeaderRecyclerView.cs" />
+    <Compile Include="UI\Views\StickyHeaderView.cs" />
+    <Compile Include="UI\Views\ViewTreeObserverExtensions.cs" />
+    <Compile Include="UI\Utils\AnimatorBuilder.cs" />
+    <Compile Include="UI\Utils\BaseStickyHeaderAnimator.cs" />
+    <Compile Include="UI\Utils\HeaderAnimator.cs" />
+    <Compile Include="UI\Utils\HeaderStickyAnimator.cs" />
+    <Compile Include="UI\Utils\SimpleHeaderStickyAnimator.cs" />
+    <Compile Include="UI\Views\StickyHeaderListView.cs" />
+    <Compile Include="UI\Views\StickyHeaderScrollView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -673,6 +684,7 @@
     <AndroidResource Include="Resources\drawable-xhdpi\IcGoogle.png" />
     <AndroidResource Include="Resources\color\ButtonRedTextColor.xml" />
     <AndroidResource Include="Resources\drawable\LoginBackground.xml" />
+    <AndroidResource Include="Resources\layout\ManualEditForm.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>

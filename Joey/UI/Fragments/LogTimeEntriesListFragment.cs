@@ -17,6 +17,7 @@ using Toggl.Phoebe.Data;
 using Toggl.Phoebe.Data.Utils;
 using Toggl.Phoebe.Data.Views;
 using XPlatUtils;
+using StickyHeader;
 
 namespace Toggl.Joey.UI.Fragments
 {
@@ -31,6 +32,7 @@ namespace Toggl.Joey.UI.Fragments
         private FrameLayout undoBar;
         private Button undoButton;
         private bool isUndoShowed;
+        private ViewGroup cont;
 
         public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -42,10 +44,11 @@ namespace Toggl.Joey.UI.Fragments
             emptyMessageView.Visibility = ViewStates.Gone;
             recyclerView = view.FindViewById<RecyclerView> (Resource.Id.LogRecyclerView);
 
+
             undoBar = view.FindViewById<FrameLayout> (Resource.Id.UndoBar);
             undoButton = view.FindViewById<Button> (Resource.Id.UndoButton);
             undoButton.Click += UndoBtnClicked;
-
+            cont = container;
             return view;
         }
 
@@ -58,12 +61,17 @@ namespace Toggl.Joey.UI.Fragments
             var itemTouchListener = new ItemTouchListener (recyclerView, this);
 
             recyclerView.SetLayoutManager (linearLayout);
-            recyclerView.AddItemDecoration (new DividerItemDecoration (Activity, DividerItemDecoration.VerticalList));
-            recyclerView.AddItemDecoration (new ShadowItemDecoration (Activity));
+//            recyclerView.AddItemDecoration (new DividerItemDecoration (Activity, DividerItemDecoration.VerticalList));
+//            recyclerView.AddItemDecoration (new ShadowItemDecoration (Activity));
             recyclerView.AddOnItemTouchListener (swipeTouchListener);
             recyclerView.AddOnItemTouchListener (itemTouchListener);
             recyclerView.AddOnScrollListener (new RecyclerViewScrollDetector (this));
             recyclerView.GetItemAnimator ().SupportsChangeAnimations = false;
+
+            StickyHeaderBuilder
+            .StickTo (recyclerView)
+            .SetHeader (Resource.Id.LogEntriesHeader, cont)
+            .Apply ();
 
             var bus = ServiceContainer.Resolve<MessageBus> ();
             subscriptionSettingChanged = bus.Subscribe<SettingChangedMessage> (OnSettingChanged);
