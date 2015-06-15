@@ -122,7 +122,6 @@
     <Compile Include="Net\NetworkPresence.cs" />
     <Compile Include="UI\Fragments\BaseDateTimeDialogFragment.cs" />
     <Compile Include="UI\Fragments\FeedbackFragment.cs" />
-    <Compile Include="UI\Fragments\BaseEditTimeEntryFragment.cs" />
     <Compile Include="UI\Views\LogTimeEntryItem.cs" />
     <Compile Include="UI\Views\FadeDrawable.cs" />
     <Compile Include="UI\Views\FadeLinearLayout.cs" />
@@ -175,8 +174,9 @@
     <Compile Include="UI\Utils\SimpleHeaderStickyAnimator.cs" />
     <Compile Include="UI\Views\StickyHeaderListView.cs" />
     <Compile Include="UI\Views\StickyHeaderScrollView.cs" />
-    <Compile Include="UI\Fragments\ManualEditTimeEntryFragment.cs" />
     <Compile Include="UI\Fragments\HomeScreenFragment.cs" />
+    <Compile Include="UI\Fragments\BaseEditTimeEntryFragment.cs" />
+    <Compile Include="UI\Fragments\ManualEditTimeEntryFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -686,6 +686,7 @@
     <AndroidResource Include="Resources\drawable\LoginBackground.xml" />
     <AndroidResource Include="Resources\layout\ManualEditForm.axml" />
     <AndroidResource Include="Resources\layout\HomeScreenFragment.axml" />
+    <AndroidResource Include="Resources\layout\ManualEditTimeEntryFragment.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
