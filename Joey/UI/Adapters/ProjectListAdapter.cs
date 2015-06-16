@@ -57,7 +57,7 @@ namespace Toggl.Joey.UI.Adapters
                 // projects
                 if (viewType == ViewTypeProject) {
                     view =  LayoutInflater.FromContext (ServiceContainer.Resolve<Context> ()).Inflate (Resource.Layout.ProjectListProjectItem, parent, false);
-                    holder = new ProjectListItemHolder (this, view, HandleTasksProjectItemClick);
+                    holder = new ProjectListItemHolder (this, view, HandleTasksProjectItemClick, HandleProjectItemClick);
                 } else if (viewType == ViewTypeNewProject) {
                     view =  LayoutInflater.FromContext (ServiceContainer.Resolve<Context> ()).Inflate (Resource.Layout.ProjectListNewProjectItem, parent, false);
                     holder = new NewProjectListItemHolder (this, view);
@@ -72,13 +72,23 @@ namespace Toggl.Joey.UI.Adapters
             return holder;
         }
 
+        private void HandleProjectItemClick (int position) 
+        {
+            var proj = (WorkspaceProjectsView.Project)GetEntry (position);
+            var handler = HandleProjectSelection;
+            if (handler != null) {
+                handler (proj);
+            }
+            return;
+        }
+
         private void HandleTasksProjectItemClick (int position)
         {
+            var proj = (WorkspaceProjectsView.Project)GetEntry (position);
             if (TasksProjectItemClick != null) {
                 TasksProjectItemClick (this, position);
             }
 
-            var proj = (WorkspaceProjectsView.Project)GetEntry (position);
             int collapsingCount;
             collectionView.ShowTaskForProject (proj, position, out collapsingCount);
             owner.ScrollToPosition (position - collapsingCount);
@@ -182,9 +192,9 @@ namespace Toggl.Joey.UI.Adapters
 
             public ImageView TasksImageView { get; private set; }
 
-            private Action<int> tasksClickListener;
+            private Action<int> clickListener;
 
-            public ProjectListItemHolder (ProjectListAdapter adapter, View root, Action<int> tasksClickListener) : base (root)
+            public ProjectListItemHolder (ProjectListAdapter adapter, View root, Action<int> tasksClickListener, Action<int> clickListener) : base (root)
             {
                 this.adapter = adapter;
                 ColorView = root.FindViewById<View> (Resource.Id.ColorView);
@@ -193,15 +203,19 @@ namespace Toggl.Joey.UI.Adapters
                 TasksFrameLayout = root.FindViewById<FrameLayout> (Resource.Id.TasksFrameLayout);
                 TasksTextView = root.FindViewById<TextView> (Resource.Id.TasksTextView).SetFont (Font.RobotoMedium);
 
-                this.tasksClickListener = tasksClickListener;
+                this.clickListener = clickListener;
 
+                TasksFrameLayout.Click += (sender, e) => tasksClickListener (AdapterPosition);
                 root.SetOnClickListener (this);
             }
 
             public void OnClick (View v)
             {
-                if (tasksClickListener != null) {
-                    tasksClickListener (base.AdapterPosition);
+                if (v == TasksImageView || v == TasksTextView) {
+                    return;
+                }
+                if (clickListener != null) {
+                    clickListener (AdapterPosition);
                 }
             }
 
@@ -269,7 +283,7 @@ namespace Toggl.Joey.UI.Adapters
 
                 model = null;
                 if (DataSource != null) {
-                    model = (TaskModel)DataSource;
+                    model = DataSource;
                 }
 
                 if (model == null) {
